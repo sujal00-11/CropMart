@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CropMart — AI-Powered Farm-to-Market Marketplace</title>
+  <meta name="description" content="AI-powered direct marketplace connecting farmers, FPOs, bulk buyers and consumers. Predict → Match → Aggregate → Deliver." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- ===================== HEADER / NAV ===================== -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="#home" class="logo" aria-label="CropMart Home">
+        <span class="logo-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Leaf body -->
+            <path d="M24 6C24 6 10 14 10 28c0 8 6 14 14 14s14-6 14-14C38 14 24 6 24 6z" fill="url(#leafGrad)"/>
+            <!-- Leaf vein -->
+            <path d="M24 12v28" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+            <path d="M24 20c-4 3-7 7-8 12M24 20c4 3 7 7 8 12" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <!-- AI circuit nodes -->
+            <circle cx="24" cy="22" r="3.5" fill="#fff"/>
+            <circle cx="16" cy="28" r="2" fill="#a5d6a7"/>
+            <circle cx="32" cy="28" r="2" fill="#a5d6a7"/>
+            <circle cx="24" cy="34" r="2" fill="#a5d6a7"/>
+            <line x1="24" y1="22" x2="16" y2="28" stroke="#fff" stroke-width="1.2" opacity="0.8"/>
+            <line x1="24" y1="22" x2="32" y2="28" stroke="#fff" stroke-width="1.2" opacity="0.8"/>
+            <line x1="24" y1="22" x2="24" y2="34" stroke="#fff" stroke-width="1.2" opacity="0.8"/>
+            <defs>
+              <linearGradient id="leafGrad" x1="10" y1="6" x2="38" y2="42" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#43a047"/>
+                <stop offset="1" stop-color="#1b5e20"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <span class="logo-text">CropMart</span>
+      </a>
+
+      <nav class="nav" id="nav">
+        <a href="#home" class="nav-link active" data-i18n="nav_home">Home</a>
+        <a href="#marketplace" class="nav-link" data-i18n="nav_marketplace">Marketplace</a>
+        <a href="#how-it-works" class="nav-link" data-i18n="nav_how">How It Works</a>
+        <a href="#ai-insights" class="nav-link" data-i18n="nav_ai">AI Insights</a>
+        <a href="#about" class="nav-link" data-i18n="nav_about">About</a>
+        <a href="#contact" class="nav-link" data-i18n="nav_contact">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <div class="lang-switch">
+          <button class="lang-btn active" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="hi">हि</button>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="btn btn-outline btn-sm" id="loginBtn" data-i18n="nav_login">Login</button>
+        <button class="btn btn-primary btn-sm" id="getStartedBtn" data-i18n="nav_get_started">Get Started</button>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#home" class="nav-link" data-i18n="nav_home">Home</a>
+    <a href="#marketplace" class="nav-link" data-i18n="nav_marketplace">Marketplace</a>
+    <a href="#how-it-works" class="nav-link" data-i18n="nav_how">How It Works</a>
+    <a href="#ai-insights" class="nav-link" data-i18n="nav_ai">AI Insights</a>
+    <a href="#about" class="nav-link" data-i18n="nav_about">About</a>
+    <a href="#contact" class="nav-link" data-i18n="nav_contact">Contact</a>
+    <button class="btn btn-outline" id="mobileLoginBtn" data-i18n="nav_login">Login</button>
+    <button class="btn btn-primary" id="mobileGetStartedBtn" data-i18n="nav_get_started">Get Started</button>
+  </div>
+
+  <main>
+    <!-- ===================== HERO ===================== -->
+    <section class="hero" id="home">
+      <div class="hero-bg"></div>
+      <div class="container hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title" data-i18n="hero_title">From Farm to Market,<br>Without the Middlemen.</h1>
+          <p class="hero-sub" data-i18n="hero_sub">AI-powered direct marketplace connecting farmers, FPOs, bulk buyers and consumers.</p>
+          <div class="hero-btns">
+            <a href="#marketplace" class="btn btn-primary btn-lg" data-i18n="hero_explore">Explore Marketplace</a>
+            <button class="btn btn-outline btn-lg" id="joinFarmerBtn" data-i18n="hero_join">Join as Farmer</button>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-card">
+              <i class="fas fa-store"></i>
+              <span data-i18n="stat_direct">Direct Market Access</span>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-chart-line"></i>
+              <span data-i18n="stat_price">Better Price Discovery</span>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-users"></i>
+              <span data-i18n="stat_match">Smart Buyer Matching</span>
+            </div>
+            <div class="stat-card">
+              <i class="fas fa-truck"></i>
+              <span data-i18n="stat_delivery">Optimized Delivery</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="flow-chain">
+            <div class="flow-node"><i class="fas fa-tractor"></i><span>Farmer</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node highlight"><i class="fas fa-brain"></i><span>CropMart</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node"><i class="fas fa-shopping-basket"></i><span>Buyer</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node"><i class="fas fa-shipping-fast"></i><span>Delivery</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PROBLEM ===================== -->
+    <section class="section problem-section" id="problem">
+      <div class="container">
+        <div class="section-header">
+          <h2 data-i18n="problem_title">The Broken Supply Chain</h2>
+          <p data-i18n="problem_sub">Too many hands, too little value for farmers and consumers.</p>
+        </div>
+        <div class="problem-grid">
+          <div class="chain-card current">
+            <h3>CURRENT SYSTEM</h3>
+            <div class="chain-flow vertical">
+              <div class="chain-item">Farmer</div>
+              <div class="chain-down">↓</div>
+              <div class="chain-item muted">Trader</div>
+              <div class="chain-down">↓</div>
+              <div class="chain-item muted">Wholesaler</div>
+              <div class="chain-down">↓</div>
+              <div class="chain-item muted">Distributor</div>
+              <div class="chain-down">↓</div>
+              <div class="chain-item muted">Retailer</div>
+              <div class="chain-down">↓</div>
+              <div class="chain-item">Consumer</div>
+            </div>
+            <ul class="problem-list">
+              <li><i class="fas fa-times-circle"></i> Multiple intermediaries</li>
+              <li><i class="fas fa-times-circle"></i> Low farmer realization</li>
+              <li><i class="fas fa-times-circle"></i> High consumer prices</li>
+              <li><i class="fas fa-times-circle"></i> Lack of price transparency</li>
+              <li><i class="fas fa-times-circle"></i> Inefficient logistics</li>
+              <li><i class="fas fa-times-circle"></i> Produce wastage</li>
+            </ul>
+          </div>
+          <div class="chain-card solution">
+            <h3>CROPMART</h3>
+            <div class="chain-flow vertical">
+              <div class="chain-item success">Farmer / FPO</div>
+              <div class="chain-down success">↓</div>
+              <div class="chain-item success highlight-box">AI Marketplace</div>
+              <div class="chain-down success">↓</div>
+              <div class="chain-item success">Buyer / Consumer</div>
+              <div class="chain-down success">↓</div>
+              <div class="chain-item success">Smart Logistics</div>
+            </div>
+            <ul class="problem-list success-list">
+              <li><i class="fas fa-check-circle"></i> Direct connection</li>
+              <li><i class="fas fa-check-circle"></i> Higher farmer income</li>
+              <li><i class="fas fa-check-circle"></i> Fair consumer prices</li>
+              <li><i class="fas fa-check-circle"></i> Full price transparency</li>
+              <li><i class="fas fa-check-circle"></i> AI-optimized routes</li>
+              <li><i class="fas fa-check-circle"></i> Reduced wastage</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MARKETPLACE ===================== -->
+    <section class="section marketplace-section" id="marketplace">
+      <div class="container">
+        <div class="section-header">
+          <h2 data-i18n="market_title">Marketplace</h2>
+          <p data-i18n="market_sub">Fresh produce directly from farmers & FPOs</p>
+        </div>
+
+        <div class="market-controls">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="productSearch" placeholder="Search products..." data-i18n-placeholder="search_placeholder" />
+          </div>
+          <div class="filters">
+            <select id="categoryFilter">
+              <option value="">All Categories</option>
+              <option value="Vegetables">Vegetables</option>
+              <option value="Fruits">Fruits</option>
+              <option value="Grains">Grains</option>
+              <option value="Pulses">Pulses</option>
+            </select>
+            <select id="locationFilter">
+              <option value="">All Locations</option>
+              <option value="Nashik">Nashik</option>
+              <option value="Pune">Pune</option>
+              <option value="Nagpur">Nagpur</option>
+              <option value="Aurangabad">Aurangabad</option>
+              <option value="Kolhapur">Kolhapur</option>
+            </select>
+            <select id="sortFilter">
+              <option value="default">Sort by</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="qty-desc">Quantity: High to Low</option>
+            </select>
+            <div class="price-range">
+              <label>Max ₹/kg: <span id="priceValue">100</span></label>
+              <input type="range" id="priceRange" min="10" max="100" value="100" />
+            </div>
+          </div>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+          <!-- Products rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section class="section how-section" id="how-it-works">
+      <div class="container">
+        <div class="section-header">
+          <h2 data-i18n="how_title">How It Works</h2>
+          <p data-i18n="how_sub">Predict → Match → Aggregate → Deliver</p>
+        </div>
+        <div class="steps-flow">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <i class="fas fa-list"></i>
+            <h4>LIST PRODUCE</h4>
+            <p>Farmers & FPOs list produce with quantity, quality & price.</p>
+          </div>
+          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <i class="fas fa-chart-area"></i>
+            <h4>DEMAND FORECAST</h4>
+            <p>AI predicts demand and recommends optimal supply levels.</p>
+          </div>
+          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <i class="fas fa-handshake"></i>
+            <h4>MATCH BUYER</h4>
+            <p>Smart matching connects produce with the best buyers.</p>
+          </div>
+          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <i class="fas fa-route"></i>
+            <h4>OPTIMIZE ROUTE</h4>
+            <p>AI optimizes pickup, aggregation & delivery routes.</p>
+          </div>
+          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+          <div class="step-card">
+            <div class="step-num">5</div>
+            <i class="fas fa-check-double"></i>
+            <h4>DELIVER & PAY</h4>
+            <p>Transparent delivery tracking and direct payments.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== AI INSIGHTS ===================== -->
+    <section class="section ai-section" id="ai-insights">
+      <div class="container">
+        <div class="section-header">
+          <h2 data-i18n="ai_title">AI Insights</h2>
+          <p data-i18n="ai_sub">Prototype AI predictions for demand, price & matching</p>
+        </div>
+
+        <!-- Demand Forecasting -->
+        <div class="ai-card">
+          <div class="ai-card-header">
+            <h3><i class="fas fa-brain"></i> AI Demand Forecast</h3>
+            <span class="proto-badge">Prototype AI Prediction</span>
+          </div>
+          <div class="ai-controls">
+            <label>Select Crop:</label>
+            <select id="demandCrop">
+              <option value="onion">onion</option>
+              <option value="potato">Potato</option>
+              <option value="tomato">Tomato</option>
+              <option value="wheat">Wheat</option>
+              <option value="rice">Rice</option>
+              <option value="mango">Mango</option>
+            </select>
+          </div>
+          <div class="demand-cards" id="demandCards">
+            <!-- Filled by JS -->
+          </div>
+          <div class="chart-wrap">
+            <canvas id="demandChart" height="120"></canvas>
+          </div>
+        </div>
+
+        <!-- Price Intelligence -->
+        <div class="ai-card">
+          <div class="ai-card-header">
+            <h3><i class="fas fa-tags"></i> Smart Price Intelligence</h3>
+            <span class="proto-badge">Prototype AI Prediction</span>
+          </div>
+          <div class="ai-controls">
+            <label>Select Crop:</label>
+            <select id="priceCrop">
+              <option value="onion">onion</option>
+              <option value="potato">Potato</option>
+              <option value="Tomato">tomato</option>
+              <option value="wheat">Wheat</option>
+              <option value="rice">Rice</option>
+              <option value="mango">Mango</option>
+            </select>
+          </div>
+          <div class="price-intel" id="priceIntel">
+            <!-- Filled by JS -->
+          </div>
+          <div class="chart-wrap">
+            <canvas id="priceChart" height="120"></canvas>
+          </div>
+        </div>
+
+        <!-- Buyer Matching -->
+        <div class="ai-card">
+          <div class="ai-card-header">
+            <h3><i class="fas fa-user-check"></i> Smart Buyer Matching</h3>
+            <span class="proto-badge">Prototype AI Prediction</span>
+          </div>
+          <div class="match-controls">
+            <select id="matchProduct">
+              <option value="onion">onion
+                
+            — 500 kg</option>
+              <option value="potato">Potato — 800 kg</option>
+              <option value="tomato">tomato — 600 kg</option>
+            </select>
+            <select id="matchSort">
+              <option value="score">Sort by Match Score</option>
+              <option value="price">Sort by Offer Price</option>
+              <option value="distance">Sort by Distance</option>
+              <option value="qty">Sort by Required Qty</option>
+            </select>
+          </div>
+          <div class="buyer-matches" id="buyerMatches">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SMART LOGISTICS ===================== -->
+    <section class="section logistics-section" id="logistics">
+      <div class="container">
+        <div class="section-header">
+          <h2>Smart Logistics</h2>
+          <p>AI-optimized aggregation & delivery routes</p>
+        </div>
+        <div class="logistics-grid">
+          <div class="route-visual">
+            <div class="route-node start"><i class="fas fa-map-marker-alt"></i> Farm A (Nashik)</div>
+            <div class="route-line"></div>
+            <div class="route-node"><i class="fas fa-map-marker-alt"></i> Farm B (Sinnar)</div>
+            <div class="route-line"></div>
+            <div class="route-node center"><i class="fas fa-warehouse"></i> Aggregation Center</div>
+            <div class="route-line"></div>
+            <div class="route-node end"><i class="fas fa-store"></i> Buyer (Pune)</div>
+          </div>
+          <div class="route-stats">
+            <h3>AI Optimized Route</h3>
+            <div class="stat-row"><span>Distance</span><strong id="routeDistance">42 km</strong></div>
+            <div class="stat-row"><span>Estimated Time</span><strong id="routeTime">1h 15m</strong></div>
+            <div class="stat-row"><span>Vehicle</span><strong>Mini Truck (1.5T)</strong></div>
+            <div class="stat-row"><span>Estimated Cost</span><strong id="routeCost">₹850</strong></div>
+            <button class="btn btn-primary" id="optimizeRouteBtn"><i class="fas fa-magic"></i> Optimize Route</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ORDER TRACKING ===================== -->
+    <section class="section order-section" id="orders">
+      <div class="container">
+        <div class="section-header">
+          <h2>Order Tracking</h2>
+          <p>Live status of your orders</p>
+        </div>
+        <div class="order-panel" id="orderPanel">
+          <!-- Filled by JS -->
+        </div>
+        <div class="order-actions">
+          <button class="btn btn-outline" id="prevStatusBtn">← Previous Status</button>
+          <button class="btn btn-primary" id="nextStatusBtn">Next Status →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== STAKEHOLDER BENEFITS ===================== -->
+    <section class="section benefits-section" id="about">
+      <div class="container">
+        <div class="section-header">
+          <h2>Built for Every Stakeholder</h2>
+          <p>One platform • Three stakeholders • Measurable impact</p>
+        </div>
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <div class="benefit-icon"><i class="fas fa-tractor"></i></div>
+            <h3>Farmers / FPOs</h3>
+            <ul>
+              <li>Better price discovery</li>
+              <li>More buyers</li>
+              <li>Direct market access</li>
+              <li>Transparent pricing</li>
+              <li>Produce aggregation</li>
+            </ul>
+            <button class="btn btn-primary btn-sm join-farmer-cta">Start Selling Directly</button>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon"><i class="fas fa-building"></i></div>
+            <h3>Bulk Buyers</h3>
+            <ul>
+              <li>Reliable supply</li>
+              <li>Bulk matching</li>
+              <li>Lower procurement effort</li>
+              <li>Direct farmer connection</li>
+              <li>Quality information</li>
+            </ul>
+            <button class="btn btn-primary btn-sm" id="findSuppliersBtn">Find Suppliers</button>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon"><i class="fas fa-shopping-cart"></i></div>
+            <h3>Consumers</h3>
+            <ul>
+              <li>Transparent prices</li>
+              <li>Direct sourcing</li>
+              <li>Fresh produce</li>
+              <li>Farmer connection</li>
+              <li>Better traceability</li>
+            </ul>
+            <a href="#marketplace" class="btn btn-primary btn-sm">Shop Fresh Produce</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== IMPACT ===================== -->
+    <section class="section impact-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>One Platform • Three Stakeholders • Measurable Impact</h2>
+        </div>
+        <div class="impact-grid">
+          <div class="impact-card">
+            <div class="impact-value" data-target="32">0</div>
+            <div class="impact-label">↑ Farmer Realization %</div>
+          </div>
+          <div class="impact-card">
+            <div class="impact-value" data-target="18">0</div>
+            <div class="impact-label">↓ Consumer Price %</div>
+          </div>
+          <div class="impact-card">
+            <div class="impact-value" data-target="25">0</div>
+            <div class="impact-label">↓ Logistics Cost %</div>
+          </div>
+          <div class="impact-card">
+            <div class="impact-value" data-target="40">0</div>
+            <div class="impact-label">↓ Food Wastage %</div>
+          </div>
+          <div class="impact-card">
+            <div class="impact-value" data-target="3">0</div>
+            <div class="impact-label">× Market Access</div>
+          </div>
+          <div class="impact-card">
+            <div class="impact-value" data-target="100">0</div>
+            <div class="impact-label">% Price Transparency</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== DASHBOARDS (hidden by default) ===================== -->
+    <section class="section dashboard-section hidden" id="farmerDashboard">
+      <div class="container dashboard-layout">
+        <aside class="dash-sidebar">
+          <h3>Farmer Dashboard</h3>
+          <nav class="dash-nav">
+            <a href="#" class="dash-link active" data-panel="fd-overview"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#" class="dash-link" data-panel="fd-produce"><i class="fas fa-carrot"></i> My Produce</a>
+            <a href="#" class="dash-link" data-panel="fd-orders"><i class="fas fa-box"></i> Orders</a>
+            <a href="#" class="dash-link" data-panel="fd-buyers"><i class="fas fa-users"></i> Buyers</a>
+            <a href="#" class="dash-link" data-panel="fd-ai"><i class="fas fa-brain"></i> AI Predictions</a>
+            <a href="#" class="dash-link" data-panel="fd-price"><i class="fas fa-chart-line"></i> Price Intelligence</a>
+            <a href="#" class="dash-link" data-panel="fd-payments"><i class="fas fa-rupee-sign"></i> Payments</a>
+            <a href="#" class="dash-link" data-panel="fd-profile"><i class="fas fa-user"></i> Profile</a>
+          </nav>
+          <button class="btn btn-outline btn-sm" id="logoutFarmer">Logout</button>
+        </aside>
+        <div class="dash-main">
+          <div class="dash-panel active" id="fd-overview">
+            <h2>Overview</h2>
+            <div class="dash-stats">
+              <div class="dash-stat"><span class="num" id="fdTotalProduce">0</span><span>Total Produce Listed</span></div>
+              <div class="dash-stat"><span class="num" id="fdActiveOrders">0</span><span>Active Orders</span></div>
+              <div class="dash-stat"><span class="num" id="fdTotalSales">₹0</span><span>Total Sales</span></div>
+              <div class="dash-stat"><span class="num" id="fdPending">₹0</span><span>Pending Payments</span></div>
+            </div>
+          </div>
+          <div class="dash-panel" id="fd-produce">
+            <h2>My Produce</h2>
+            <button class="btn btn-primary" id="showListFormBtn"><i class="fas fa-plus"></i> List New Produce</button>
+            <form class="list-form hidden" id="listProduceForm">
+              <div class="form-row">
+                <input type="text" id="lpName" placeholder="Product name" required />
+                <select id="lpCategory" required>
+                  <option value="">Category</option>
+                  <option>Vegetables</option>
+                  <option>Fruits</option>
+                  <option>Grains</option>
+                  <option>Pulses</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <input type="number" id="lpQty" placeholder="Quantity (kg)" required />
+                <input type="number" id="lpPrice" placeholder="Price / kg" required />
+              </div>
+              <div class="form-row">
+                <select id="lpQuality" required>
+                  <option value="">Quality Grade</option>
+                  <option>A</option>
+                  <option>B</option>
+                  <option>C</option>
+                </select>
+                <input type="date" id="lpHarvest" required />
+              </div>
+              <div class="form-row">
+                <input type="text" id="lpLocation" placeholder="Location" required />
+                <input type="text" id="lpAvailability" placeholder="Expected availability" />
+              </div>
+              <div class="form-row">
+                <input type="url" id="lpImage" placeholder="Image URL (optional)" />
+              </div>
+              <button type="submit" class="btn btn-primary">Add Produce</button>
+            </form>
+            <div class="my-produce-list" id="myProduceList"></div>
+          </div>
+          <div class="dash-panel" id="fd-orders"><h2>Orders</h2><p>Your active and past orders will appear here.</p></div>
+          <div class="dash-panel" id="fd-buyers"><h2>Buyers</h2><p>Matched buyers will appear here.</p></div>
+          <div class="dash-panel" id="fd-ai"><h2>AI Predictions</h2><p>Go to AI Insights section for full forecasts.</p></div>
+          <div class="dash-panel" id="fd-price"><h2>Price Intelligence</h2><p>Go to AI Insights section for price data.</p></div>
+          <div class="dash-panel" id="fd-payments"><h2>Payments</h2><p>Payment history and pending amounts.</p></div>
+          <div class="dash-panel" id="fd-profile"><h2>Profile</h2><p id="farmerProfileInfo">Logged in as Farmer</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section dashboard-section hidden" id="buyerDashboard">
+      <div class="container dashboard-layout">
+        <aside class="dash-sidebar">
+          <h3>Buyer Dashboard</h3>
+          <nav class="dash-nav">
+            <a href="#" class="dash-link active" data-panel="bd-overview"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#" class="dash-link" data-panel="bd-search"><i class="fas fa-search"></i> Search Produce</a>
+            <a href="#" class="dash-link" data-panel="bd-bulk"><i class="fas fa-boxes"></i> Bulk Requirement</a>
+            <a href="#" class="dash-link" data-panel="bd-orders"><i class="fas fa-box"></i> Active Orders</a>
+            <a href="#" class="dash-link" data-panel="bd-history"><i class="fas fa-history"></i> Purchase History</a>
+            <a href="#" class="dash-link" data-panel="bd-saved"><i class="fas fa-heart"></i> Saved Farmers</a>
+            <a href="#" class="dash-link" data-panel="bd-compare"><i class="fas fa-balance-scale"></i> Price Comparison</a>
+          </nav>
+          <button class="btn btn-outline btn-sm" id="logoutBuyer">Logout</button>
+        </aside>
+        <div class="dash-main">
+          <div class="dash-panel active" id="bd-overview">
+            <h2>Overview</h2>
+            <div class="dash-stats">
+              <div class="dash-stat"><span class="num">12</span><span>Active Orders</span></div>
+              <div class="dash-stat"><span class="num">₹1.2L</span><span>This Month</span></div>
+              <div class="dash-stat"><span class="num">8</span><span>Saved Farmers</span></div>
+            </div>
+          </div>
+          <div class="dash-panel" id="bd-search">
+            <h2>Search Produce</h2>
+            <p>Use the main Marketplace to browse and buy.</p>
+            <a href="#marketplace" class="btn btn-primary">Go to Marketplace</a>
+          </div>
+          <div class="dash-panel" id="bd-bulk">
+            <h2>Create Bulk Requirement</h2>
+            <form id="bulkReqForm" class="list-form">
+              <div class="form-row">
+                <select id="brProduct" required>
+                  <option value="">Product</option>
+                  <option>onion</option>
+                  <option>Potato</option>
+                  <option>tomato</option>
+                  <option>Wheat</option>
+                  <option>Rice</option>
+                  <option>Mango</option>
+                </select>
+                <input type="number" id="brQty" placeholder="Required quantity (kg)" required />
+              </div>
+              <div class="form-row">
+                <input type="number" id="brMaxPrice" placeholder="Max price / kg" required />
+                <input type="text" id="brLocation" placeholder="Delivery location" required />
+              </div>
+              <div class="form-row">
+                <input type="date" id="brDate" required />
+              </div>
+              <button type="submit" class="btn btn-primary">Find Matching Farmers</button>
+            </form>
+            <div id="bulkMatches" class="buyer-matches"></div>
+          </div>
+          <div class="dash-panel" id="bd-orders"><h2>Active Orders</h2><p>Your current orders.</p></div>
+          <div class="dash-panel" id="bd-history"><h2>Purchase History</h2><p>Past purchases.</p></div>
+          <div class="dash-panel" id="bd-saved"><h2>Saved Farmers</h2><p>Your favourite farmers & FPOs.</p></div>
+          <div class="dash-panel" id="bd-compare"><h2>Price Comparison</h2><p>Compare prices across listings.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CONTACT ===================== -->
+    <section class="section contact-section" id="contact">
+      <div class="container">
+        <div class="section-header">
+          <h2>Contact Us</h2>
+          <p>Have questions? Reach out to the CropMart team.</p>
+        </div>
+        <form class="contact-form" id="contactForm">
+          <div class="form-row">
+            <input type="text" placeholder="Your Name" required />
+            <input type="email" placeholder="Email" required />
+          </div>
+          <div class="form-row">
+            <input type="text" placeholder="Subject" required />
+          </div>
+          <textarea placeholder="Message" rows="4" required></textarea>
+          <button type="submit" class="btn btn-primary">Send Message</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M24 6C24 6 10 14 10 28c0 8 6 14 14 14s14-6 14-14C38 14 24 6 24 6z" fill="url(#leafGradF)"/>
+            <path d="M24 12v28" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+            <path d="M24 20c-4 3-7 7-8 12M24 20c4 3 7 7 8 12" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <circle cx="24" cy="22" r="3.5" fill="#fff"/>
+            <circle cx="16" cy="28" r="2" fill="#a5d6a7"/>
+            <circle cx="32" cy="28" r="2" fill="#a5d6a7"/>
+            <circle cx="24" cy="34" r="2" fill="#a5d6a7"/>
+            <line x1="24" y1="22" x2="16" y2="28" stroke="#fff" stroke-width="1.2" opacity="0.8"/>
+            <line x1="24" y1="22" x2="32" y2="28" stroke="#fff" stroke-width="1.2" opacity="0.8"/>
+            <line x1="24" y1="22" x2="24" y2="34" stroke="#fff" stroke-width="1.2" opacity="0.8"/>
+            <defs>
+              <linearGradient id="leafGradF" x1="10" y1="6" x2="38" y2="42" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#81c784"/>
+                <stop offset="1" stop-color="#43a047"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <div>
+          <strong>CropMart</strong>
+          <p>AI-powered farm-to-market marketplace</p>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="#home">Home</a>
+        <a href="#marketplace">Marketplace</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#ai-insights">AI Insights</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <p class="copyright">© 2026 CropMart. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ===================== MODALS ===================== -->
+  <!-- Auth Modal -->
+  <div class="modal" id="authModal">
+    <div class="modal-content auth-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Login</button>
+        <button class="auth-tab" data-tab="signup">Sign Up</button>
+      </div>
+      <form id="loginForm" class="auth-form">
+        <select id="loginType" required>
+          <option value="">User Type</option>
+          <option value="farmer">Farmer</option>
+          <option value="fpo">FPO</option>
+          <option value="buyer">Buyer</option>
+          <option value="consumer">Consumer</option>
+        </select>
+        <input type="email" id="loginEmail" placeholder="Email" required />
+        <input type="password" id="loginPassword" placeholder="Password" required />
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+      </form>
+      <form id="signupForm" class="auth-form hidden">
+        <select id="signupType" required>
+          <option value="">User Type</option>
+          <option value="farmer">Farmer</option>
+          <option value="fpo">FPO</option>
+          <option value="buyer">Buyer</option>
+          <option value="consumer">Consumer</option>
+        </select>
+        <input type="text" id="signupName" placeholder="Full Name" required />
+        <input type="email" id="signupEmail" placeholder="Email" required />
+        <input type="tel" id="signupPhone" placeholder="Phone" required />
+        <input type="password" id="signupPassword" placeholder="Password" required />
+        <input type="text" id="signupLocation" placeholder="Location" required />
+        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Product Detail Modal -->
+  <div class="modal" id="productModal">
+    <div class="modal-content product-modal">
+      <button class="modal-close" data-close>&times;</button>
+      <div id="productModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Cart Drawer -->
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+      <h3><i class="fas fa-shopping-cart"></i> Cart (<span id="cartCount">0</span>)</h3>
+      <button class="modal-close" id="closeCart">&times;</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-summary">
+      <div class="summary-row"><span>Subtotal</span><strong id="cartSubtotal">₹0</strong></div>
+      <div class="summary-row"><span>Logistics Fee</span><strong id="cartLogistics">₹0</strong></div>
+      <div class="summary-row total"><span>Total</span><strong id="cartTotal">₹0</strong></div>
+      <button class="btn btn-primary btn-block" id="checkoutBtn">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div class="modal" id="checkoutModal">
+    <div class="modal-content">
+      <button class="modal-close" data-close>&times;</button>
+      <h2>Checkout</h2>
+      <form id="checkoutForm">
+        <input type="text" id="coName" placeholder="Full Name" required />
+        <input type="tel" id="coPhone" placeholder="Phone" required />
+        <textarea id="coAddress" placeholder="Delivery Address" rows="3" required></textarea>
+        <div class="payment-options">
+          <label><input type="radio" name="payment" value="upi" checked /> UPI</label>
+          <label><input type="radio" name="payment" value="card" /> Card</label>
+          <label><input type="radio" name="payment" value="cod" /> Cash on Delivery</label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Pay Now</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal" id="successModal">
+    <div class="modal-content success-modal">
+      <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+      <h2>Payment Successful</h2>
+      <p>Order ID: <strong id="successOrderId"></strong></p>
+      <p>Thank you for supporting direct farm-to-market!</p>
+      <button class="btn btn-primary" data-close>Continue</button>
+    </div>
+  </div>
+
+  <!-- Floating Cart Button -->
+  <button class="fab-cart" id="fabCart" aria-label="Open cart">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="fab-badge" id="fabBadge">0</span>
+  </button>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
