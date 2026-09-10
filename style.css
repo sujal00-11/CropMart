@@ -2,7 +2,6 @@
    CropMart — Design System
    Deep green • Leaf green • Clean modern agri-tech
    ===================================================== */
-@import "tailwindcss";
 :root {
   --primary: #1b5e20;
   --primary-light: #2e7d32;
@@ -1829,4 +1828,92 @@ textarea {
   .cart-drawer {
     width: 100%;
   }
+}
+
+/* ---------- Loading & States ---------- */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.loading-spinner::after {
+  content: '';
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg) 25%, var(--border) 50%, var(--bg) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.empty-state p {
+  font-size: 1.05rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.error-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--danger);
+  background: rgba(198, 40, 40, 0.05);
+  border-radius: var(--radius);
+  border: 1px solid rgba(198, 40, 40, 0.15);
+}
+
+.api-badge {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  background: var(--success);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1500;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.api-badge.offline {
+  background: var(--warning);
+  color: #333;
+}
+
+.api-badge i {
+  font-size: 0.7rem;
 }

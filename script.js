@@ -1,177 +1,77 @@
 /* =====================================================
    CropMart — Frontend Logic
-   Demo data + interactions (backend-ready structure)
+   API-connected version with real backend integration
    ===================================================== */
 
-// -------------------- DEMO DATA --------------------
+// -------------------- API LAYER --------------------
+const API_BASE = '/api/v1';
 
-import { defineConfig } from 'vite'
-import tailwindcss from '@tailwindcss/vite'
+const api = {
+  _token: localStorage.getItem('cm_token') || null,
 
-export default defineConfig({
-  plugins: [
-    tailwindcss(),
-  ],
-})
+  setToken(token) {
+    this._token = token;
+    if (token) localStorage.setItem('cm_token', token);
+    else localStorage.removeItem('cm_token');
+  },
 
-const PRODUCTS = [
-  {
-    id: 1,
-    name: 'Tomato',
-    category: 'Vegetables',
-    farmer: 'Ramesh Patil',
-    fpo: 'Nashik Farmers FPO',
-    location: 'Nashik',
-    quantity: 500,
-    price: 28,
-    grade: 'A',
-    harvest: '2026-09-02',
-    image: 'https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?w=400&q=80',
-    delivery: '2-3 days',
-    aiInsight: 'Demand rising. Suggested price ₹29/kg based on local average.'
+  getToken() {
+    return this._token;
   },
-  {
-    id: 2,
-    name: 'Potato',
-    category: 'Vegetables',
-    farmer: 'Suresh Jadhav',
-    fpo: 'Pune Agro FPO',
-    location: 'Pune',
-    quantity: 800,
-    price: 18,
-    grade: 'A',
-    harvest: '2026-08-28',
-    image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80',
-    delivery: '1-2 days',
-    aiInsight: 'Stable demand. Good time to list additional stock.'
+
+  async request(endpoint, options = {}) {
+    const url = API_BASE + endpoint;
+    const headers = { 'Content-Type': 'application/json', ...options.headers };
+    if (this._token) {
+      headers['Authorization'] = 'Bearer ' + this._token;
+    }
+    try {
+      const resp = await fetch(url, { ...options, headers });
+      if (resp.status === 401) {
+        // Token expired or invalid
+        this.setToken(null);
+        localStorage.removeItem('cm_user');
+        currentUser = null;
+      }
+      const data = await resp.json();
+      if (!resp.ok) {
+        throw new Error(data.detail || 'API error');
+      }
+      return data;
+    } catch (err) {
+      console.error('API Error:', err);
+      throw err;
+    }
   },
-  {
-    id: 3,
-    name: 'Onion',
-    category: 'Vegetables',
-    farmer: 'Anita Deshmukh',
-    fpo: 'Lasalgaon Onion FPO',
-    location: 'Nashik',
-    quantity: 1200,
-    price: 22,
-    grade: 'B',
-    harvest: '2026-08-20',
-    image: 'https://images.unsplash.com/photo-1592924357228-91b4b5c7d0b0?w=400&q=80',
-    delivery: '2-4 days',
-    aiInsight: 'Slight price pressure. Consider bulk offers.'
+
+  get(endpoint) {
+    return this.request(endpoint);
   },
-  {
-    id: 4,
-    name: 'Wheat',
-    category: 'Grains',
-    farmer: 'Vijay Shinde',
-    fpo: 'Marathwada Grain FPO',
-    location: 'Aurangabad',
-    quantity: 2000,
-    price: 24,
-    grade: 'A',
-    harvest: '2026-04-15',
-    image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&q=80',
-    delivery: '3-5 days',
-    aiInsight: 'Strong institutional demand expected next week.'
+
+  post(endpoint, body) {
+    return this.request(endpoint, { method: 'POST', body: JSON.stringify(body) });
   },
-  {
-    id: 5,
-    name: 'Rice',
-    category: 'Grains',
-    farmer: 'Kavita More',
-    fpo: 'Konkan Rice Collective',
-    location: 'Kolhapur',
-    quantity: 1500,
-    price: 42,
-    grade: 'A',
-    harvest: '2026-05-10',
-    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&q=80',
-    delivery: '3-5 days',
-    aiInsight: 'Premium grade fetching higher margins.'
+
+  patch(endpoint, body) {
+    return this.request(endpoint, { method: 'PATCH', body: JSON.stringify(body) });
   },
-  {
-    id: 6,
-    name: 'Mango',
-    category: 'Fruits',
-    farmer: 'Prakash Pawar',
-    fpo: 'Ratnagiri Mango FPO',
-    location: 'Kolhapur',
-    quantity: 300,
-    price: 65,
-    grade: 'A',
-    harvest: '2026-05-25',
-    image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80',
-    delivery: '1-2 days',
-    aiInsight: 'Seasonal peak. High match score with urban buyers.'
+
+  delete(endpoint) {
+    return this.request(endpoint, { method: 'DELETE' });
   },
-  {
-    id: 7,
-    name: 'Cauliflower',
-    category: 'Vegetables',
-    farmer: 'Meena Kale',
-    fpo: 'Pune Fresh FPO',
-    location: 'Pune',
-    quantity: 250,
-    price: 30,
-    grade: 'A',
-    harvest: '2026-09-01',
-    image: 'https://images.unsplash.com/photo-1568584711075-3d9217d9e5e0?w=400&q=80',
-    delivery: '1-2 days',
-    aiInsight: 'Short shelf life — prioritize nearby buyers.'
-  },
-  {
-    id: 8,
-    name: 'Mustard',
-    category: 'Pulses',
-    farmer: 'Ravi Chavan',
-    fpo: 'Vidarbha Oilseed FPO',
-    location: 'Nagpur',
-    quantity: 900,
-    price: 55,
-    grade: 'B',
-    harvest: '2026-03-20',
-    image: 'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&q=80',
-    delivery: '4-6 days',
-    aiInsight: 'Oil mill demand steady. Good for bulk contracts.'
-  }
+};
+
+// -------------------- DEMO DATA (Fallback if API unavailable) --------------------
+const PRODUCTS_FALLBACK = [
+  { id:1, name:'Tomato', category:'Vegetables', farmer_name:'Ramesh Patil', fpo_name:'Nashik Farmers FPO', location:'Nashik', quantity_kg:500, price_per_kg:28, grade:'A', harvest_date:'2026-09-02', image_url:'https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?w=400&q=80', availability:'2-3 days' },
+  { id:2, name:'Potato', category:'Vegetables', farmer_name:'Suresh Jadhav', fpo_name:'Pune Agro FPO', location:'Pune', quantity_kg:800, price_per_kg:18, grade:'A', harvest_date:'2026-08-28', image_url:'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80', availability:'1-2 days' },
+  { id:3, name:'Onion', category:'Vegetables', farmer_name:'Anita Deshmukh', fpo_name:'Lasalgaon Onion FPO', location:'Nashik', quantity_kg:1200, price_per_kg:22, grade:'B', harvest_date:'2026-08-20', image_url:'https://images.unsplash.com/photo-1592924357228-91b4b5c7d0b0?w=400&q=80', availability:'2-4 days' },
+  { id:4, name:'Wheat', category:'Grains', farmer_name:'Vijay Shinde', fpo_name:'Marathwada Grain FPO', location:'Aurangabad', quantity_kg:2000, price_per_kg:24, grade:'A', harvest_date:'2026-04-15', image_url:'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&q=80', availability:'3-5 days' },
+  { id:5, name:'Rice', category:'Grains', farmer_name:'Kavita More', fpo_name:'Konkan Rice Collective', location:'Kolhapur', quantity_kg:1500, price_per_kg:42, grade:'A', harvest_date:'2026-05-10', image_url:'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&q=80', availability:'3-5 days' },
+  { id:6, name:'Mango', category:'Fruits', farmer_name:'Prakash Pawar', fpo_name:'Ratnagiri Mango FPO', location:'Kolhapur', quantity_kg:300, price_per_kg:65, grade:'A', harvest_date:'2026-05-25', image_url:'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80', availability:'1-2 days' },
+  { id:7, name:'Cauliflower', category:'Vegetables', farmer_name:'Meena Kale', fpo_name:'Pune Fresh FPO', location:'Pune', quantity_kg:250, price_per_kg:30, grade:'A', harvest_date:'2026-09-01', image_url:'https://images.unsplash.com/photo-1568584711075-3d9217d9e5e0?w=400&q=80', availability:'1-2 days' },
+  { id:8, name:'Mustard', category:'Pulses', farmer_name:'Ravi Chavan', fpo_name:'Vidarbha Oilseed FPO', location:'Nagpur', quantity_kg:900, price_per_kg:55, grade:'B', harvest_date:'2026-03-20', image_url:'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=400&q=80', availability:'4-6 days' },
 ];
-
-const DEMAND_DATA = {
-  tomato: { current: 820, predicted: 1050, trend: 27, rec: 'Increase supply', confidence: 87 },
-  potato: { current: 620, predicted: 700, trend: 13, rec: 'Maintain supply', confidence: 82 },
-  onion: { current: 1100, predicted: 980, trend: -11, rec: 'Reduce excess listing', confidence: 79 },
-  wheat: { current: 2400, predicted: 2650, trend: 10, rec: 'Slight increase', confidence: 85 },
-  rice: { current: 1800, predicted: 1950, trend: 8, rec: 'Maintain supply', confidence: 81 },
-  mango: { current: 420, predicted: 510, trend: 21, rec: 'Increase supply', confidence: 88 }
-};
-
-const PRICE_DATA = {
-  tomato: { market: 28, local: 26, suggested: 29, trend: 'up' },
-  potato: { market: 18, local: 17, suggested: 19, trend: 'stable' },
-  onion: { market: 22, local: 23, suggested: 21, trend: 'down' },
-  wheat: { market: 24, local: 23.5, suggested: 25, trend: 'up' },
-  rice: { market: 42, local: 40, suggested: 43, trend: 'up' },
-  mango: { market: 65, local: 60, suggested: 68, trend: 'up' }
-};
-
-const BUYER_MATCHES = {
-  tomato: [
-    { name: 'FreshMart Wholesale', score: 96, req: 400, distance: 18, offer: 29 },
-    { name: 'GreenBasket', score: 91, req: 300, distance: 25, offer: 28 },
-    { name: 'CityFresh Retail', score: 84, req: 200, distance: 32, offer: 27 }
-  ],
-  potato: [
-    { name: 'AgroLink Traders', score: 94, req: 600, distance: 22, offer: 19 },
-    { name: 'FreshMart Wholesale', score: 88, req: 400, distance: 30, offer: 18 },
-    { name: 'DailyVeg Co.', score: 79, req: 250, distance: 15, offer: 17.5 }
-  ],
-  onion: [
-    { name: 'OnionHub Bulk', score: 93, req: 500, distance: 12, offer: 23 },
-    { name: 'GreenBasket', score: 87, req: 350, distance: 28, offer: 22 },
-    { name: 'MetroMart', score: 81, req: 200, distance: 40, offer: 21 }
-  ]
-};
 
 const ORDER_STATUSES = [
   'Order Placed',
@@ -184,58 +84,36 @@ const ORDER_STATUSES = [
 
 const I18N = {
   en: {
-    nav_home: 'Home',
-    nav_marketplace: 'Marketplace',
-    nav_how: 'How It Works',
-    nav_ai: 'AI Insights',
-    nav_about: 'About',
-    nav_contact: 'Contact',
-    nav_login: 'Login',
-    nav_get_started: 'Get Started',
+    nav_home: 'Home', nav_marketplace: 'Marketplace', nav_how: 'How It Works',
+    nav_ai: 'AI Insights', nav_about: 'About', nav_contact: 'Contact',
+    nav_login: 'Login', nav_get_started: 'Get Started',
     hero_title: 'From Farm to Market,<br>Without the Middlemen.',
     hero_sub: 'AI-powered direct marketplace connecting farmers, FPOs, bulk buyers and consumers.',
-    hero_explore: 'Explore Marketplace',
-    hero_join: 'Join as Farmer',
-    stat_direct: 'Direct Market Access',
-    stat_price: 'Better Price Discovery',
-    stat_match: 'Smart Buyer Matching',
-    stat_delivery: 'Optimized Delivery',
+    hero_explore: 'Explore Marketplace', hero_join: 'Join as Farmer',
+    stat_direct: 'Direct Market Access', stat_price: 'Better Price Discovery',
+    stat_match: 'Smart Buyer Matching', stat_delivery: 'Optimized Delivery',
     problem_title: 'The Broken Supply Chain',
     problem_sub: 'Too many hands, too little value for farmers and consumers.',
-    market_title: 'Marketplace',
-    market_sub: 'Fresh produce directly from farmers & FPOs',
+    market_title: 'Marketplace', market_sub: 'Fresh produce directly from farmers & FPOs',
     search_placeholder: 'Search products...',
-    how_title: 'How It Works',
-    how_sub: 'Predict → Match → Aggregate → Deliver',
-    ai_title: 'AI Insights',
-    ai_sub: 'Prototype AI predictions for demand, price & matching'
+    how_title: 'How It Works', how_sub: 'Predict → Match → Aggregate → Deliver',
+    ai_title: 'AI Insights', ai_sub: 'Prototype AI predictions for demand, price & matching'
   },
   hi: {
-    nav_home: 'होम',
-    nav_marketplace: 'बाज़ार',
-    nav_how: 'कैसे काम करता है',
-    nav_ai: 'एआई इनसाइट्स',
-    nav_about: 'हमारे बारे में',
-    nav_contact: 'संपर्क',
-    nav_login: 'लॉगिन',
-    nav_get_started: 'शुरू करें',
+    nav_home: 'होम', nav_marketplace: 'बाज़ार', nav_how: 'कैसे काम करता है',
+    nav_ai: 'एआई इनसाइट्स', nav_about: 'हमारे बारे में', nav_contact: 'संपर्क',
+    nav_login: 'लॉगिन', nav_get_started: 'शुरू करें',
     hero_title: 'खेत से बाज़ार तक,<br>बिना बिचौलियों के।',
     hero_sub: 'किसानों, एफपीओ, थोक खरीदारों और उपभोक्ताओं को जोड़ने वाला एआई-संचालित बाज़ार।',
-    hero_explore: 'बाज़ार देखें',
-    hero_join: 'किसान के रूप में जुड़ें',
-    stat_direct: 'सीधी बाज़ार पहुँच',
-    stat_price: 'बेहतर मूल्य खोज',
-    stat_match: 'स्मार्ट खरीदार मैचिंग',
-    stat_delivery: 'अनुकूलित डिलीवरी',
+    hero_explore: 'बाज़ार देखें', hero_join: 'किसान के रूप में जुड़ें',
+    stat_direct: 'सीधी बाज़ार पहुँच', stat_price: 'बेहतर मूल्य खोज',
+    stat_match: 'स्मार्ट खरीदार मैचिंग', stat_delivery: 'अनुकूलित डिलीवरी',
     problem_title: 'टूटी हुई आपूर्ति श्रृंखला',
     problem_sub: 'बहुत ज़्यादा हाथ, किसानों और उपभोक्ताओं के लिए बहुत कम मूल्य।',
-    market_title: 'बाज़ार',
-    market_sub: 'किसानों और एफपीओ से सीधे ताज़ी उपज',
+    market_title: 'बाज़ार', market_sub: 'किसानों और एफपीओ से सीधे ताज़ी उपज',
     search_placeholder: 'उत्पाद खोजें...',
-    how_title: 'कैसे काम करता है',
-    how_sub: 'पूर्वानुमान → मैच → एकत्रीकरण → डिलीवरी',
-    ai_title: 'एआई इनसाइट्स',
-    ai_sub: 'माँग, मूल्य और मैचिंग के लिए प्रोटोटाइप एआई पूर्वानुमान'
+    how_title: 'कैसे काम करता है', how_sub: 'पूर्वानुमान → मैच → एकत्रीकरण → डिलीवरी',
+    ai_title: 'एआई इनसाइट्स', ai_sub: 'माँग, मूल्य और मैचिंग के लिए प्रोटोटाइप एआई पूर्वानुमान'
   }
 };
 
@@ -245,17 +123,14 @@ let currentUser = JSON.parse(localStorage.getItem('cm_user') || 'null');
 let currentOrderStatus = 0;
 let demandChart = null;
 let priceChart = null;
-let filteredProducts = [...PRODUCTS];
-let myProduce = []; // farmer listed items
+let allProducts = [];       // loaded from API
+let filteredProducts = [];
+let myProduce = [];
+let apiAvailable = false;   // track if backend is up
 
 // -------------------- UTILITIES --------------------
-function $(sel, ctx = document) {
-  return ctx.querySelector(sel);
-}
-
-function $$(sel, ctx = document) {
-  return [...ctx.querySelectorAll(sel)];
-}
+function $(sel, ctx = document) { return ctx.querySelector(sel); }
+function $$(sel, ctx = document) { return [...ctx.querySelectorAll(sel)]; }
 
 function toast(msg, duration = 2800) {
   const el = $('#toast');
@@ -273,6 +148,21 @@ function formatINR(n) {
   return '₹' + Number(n).toLocaleString('en-IN');
 }
 
+// -------------------- LOAD PRODUCTS (API or Fallback) --------------------
+async function loadProducts() {
+  try {
+    const products = await api.get('/products');
+    allProducts = products;
+    apiAvailable = true;
+  } catch (e) {
+    console.warn('API not available, using fallback data:', e.message);
+    allProducts = [...PRODUCTS_FALLBACK];
+    apiAvailable = false;
+  }
+  filteredProducts = [...allProducts];
+  renderProducts();
+}
+
 // -------------------- RENDER PRODUCTS --------------------
 function renderProducts(list = filteredProducts) {
   const grid = $('#productGrid');
@@ -280,29 +170,38 @@ function renderProducts(list = filteredProducts) {
     grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted)">No products match your filters.</p>';
     return;
   }
-  grid.innerHTML = list.map(p => `
+  grid.innerHTML = list.map(p => {
+    const name = p.name;
+    const farmer = p.farmer_name || p.farmer || 'Unknown';
+    const location = p.location;
+    const qty = p.quantity_kg || p.quantity;
+    const price = p.price_per_kg || p.price;
+    const grade = p.grade;
+    const image = p.image_url || p.image;
+    return `
     <article class="product-card" data-id="${p.id}">
       <div class="product-img">
-        ${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fas fa-leaf\\'></i></span>'" />` : `<span class="placeholder"><i class="fas fa-leaf"></i></span>`}
+        ${image ? `<img src="${image}" alt="${name}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\\'placeholder\\'><i class=\\'fas fa-leaf\\'></i></span>'" />` : `<span class="placeholder"><i class="fas fa-leaf"></i></span>`}
       </div>
       <div class="product-body">
-        <h3>${p.name}</h3>
+        <h3>${name}</h3>
         <div class="product-meta">
-          <span><i class="fas fa-user"></i> ${p.farmer}</span>
-          <span><i class="fas fa-map-marker-alt"></i> ${p.location}</span>
+          <span><i class="fas fa-user"></i> ${farmer}</span>
+          <span><i class="fas fa-map-marker-alt"></i> ${location}</span>
         </div>
         <div class="product-meta">
-          <span>Qty: ${p.quantity} kg</span>
-          <span>Grade: ${p.grade}</span>
+          <span>Qty: ${qty} kg</span>
+          <span>Grade: ${grade}</span>
         </div>
-        <div class="product-price">${formatINR(p.price)} <small>/ kg</small></div>
+        <div class="product-price">${formatINR(price)} <small>/ kg</small></div>
         <div class="product-actions">
           <button class="btn btn-outline btn-sm view-btn" data-id="${p.id}">View Details</button>
           <button class="btn btn-primary btn-sm buy-btn" data-id="${p.id}">Buy Now</button>
         </div>
       </div>
     </article>
-  `).join('');
+  `;
+  }).join('');
 
   $$('.view-btn').forEach(btn => btn.addEventListener('click', () => openProductModal(+btn.dataset.id)));
   $$('.buy-btn').forEach(btn => btn.addEventListener('click', () => {
@@ -318,41 +217,51 @@ function filterProducts() {
   const maxPrice = +$('#priceRange').value;
   const sort = $('#sortFilter').value;
 
-  filteredProducts = PRODUCTS.filter(p => {
-    const matchQ = !q || p.name.toLowerCase().includes(q) || p.farmer.toLowerCase().includes(q);
-    const matchC = !cat || p.category === cat;
-    const matchL = !loc || p.location === loc;
-    const matchP = p.price <= maxPrice;
+  filteredProducts = allProducts.filter(p => {
+    const name = (p.name || '').toLowerCase();
+    const farmer = (p.farmer_name || p.farmer || '').toLowerCase();
+    const price = p.price_per_kg || p.price;
+    const category = p.category;
+    const location = p.location;
+    const matchQ = !q || name.includes(q) || farmer.includes(q);
+    const matchC = !cat || category === cat;
+    const matchL = !loc || location === loc;
+    const matchP = price <= maxPrice;
     return matchQ && matchC && matchL && matchP;
   });
 
-  if (sort === 'price-asc') filteredProducts.sort((a, b) => a.price - b.price);
-  else if (sort === 'price-desc') filteredProducts.sort((a, b) => b.price - a.price);
-  else if (sort === 'qty-desc') filteredProducts.sort((a, b) => b.quantity - a.quantity);
+  if (sort === 'price-asc') filteredProducts.sort((a, b) => (a.price_per_kg||a.price) - (b.price_per_kg||b.price));
+  else if (sort === 'price-desc') filteredProducts.sort((a, b) => (b.price_per_kg||b.price) - (a.price_per_kg||a.price));
+  else if (sort === 'qty-desc') filteredProducts.sort((a, b) => (b.quantity_kg||b.quantity) - (a.quantity_kg||a.quantity));
 
   renderProducts();
 }
 
 // -------------------- PRODUCT MODAL --------------------
 function openProductModal(id) {
-  const p = PRODUCTS.find(x => x.id === id) || myProduce.find(x => x.id === id);
+  const p = allProducts.find(x => x.id === id);
   if (!p) return;
+  const farmer = p.farmer_name || p.farmer || 'Unknown';
+  const fpo = p.fpo_name || p.fpo || '';
+  const price = p.price_per_kg || p.price;
+  const qty = p.quantity_kg || p.quantity;
+  const image = p.image_url || p.image;
   const body = $('#productModalBody');
   body.innerHTML = `
     <div class="pm-img">
-      ${p.image ? `<img src="${p.image}" alt="${p.name}" />` : `<span class="placeholder" style="font-size:4rem;color:var(--accent)"><i class="fas fa-leaf"></i></span>`}
+      ${image ? `<img src="${image}" alt="${p.name}" />` : `<span class="placeholder" style="font-size:4rem;color:var(--accent)"><i class="fas fa-leaf"></i></span>`}
     </div>
     <h2>${p.name}</h2>
     <div class="pm-details">
-      <div><span>Farmer / FPO</span><strong>${p.farmer}${p.fpo ? ' · ' + p.fpo : ''}</strong></div>
+      <div><span>Farmer / FPO</span><strong>${farmer}${fpo ? ' · ' + fpo : ''}</strong></div>
       <div><span>Location</span><strong>${p.location}</strong></div>
-      <div><span>Available</span><strong>${p.quantity} kg</strong></div>
-      <div><span>Price</span><strong>${formatINR(p.price)} / kg</strong></div>
+      <div><span>Available</span><strong>${qty} kg</strong></div>
+      <div><span>Price</span><strong>${formatINR(price)} / kg</strong></div>
       <div><span>Quality Grade</span><strong>${p.grade}</strong></div>
-      <div><span>Harvest Date</span><strong>${p.harvest}</strong></div>
-      <div><span>Expected Delivery</span><strong>${p.delivery || '2-4 days'}</strong></div>
+      <div><span>Harvest Date</span><strong>${p.harvest_date || p.harvest || 'N/A'}</strong></div>
+      <div><span>Expected Delivery</span><strong>${p.availability || p.delivery || '2-4 days'}</strong></div>
     </div>
-    <div class="pm-ai"><i class="fas fa-brain"></i> <strong>AI Price Insight:</strong> ${p.aiInsight || 'Prototype prediction available in AI Insights.'}</div>
+    <div class="pm-ai"><i class="fas fa-brain"></i> <strong>AI Price Insight:</strong> Prototype prediction available in AI Insights.</div>
     <div class="pm-actions">
       <button class="btn btn-outline" id="modalAddCart" data-id="${p.id}">Add to Cart</button>
       <button class="btn btn-primary" id="modalBuyNow" data-id="${p.id}">Buy Now</button>
@@ -365,11 +274,13 @@ function openProductModal(id) {
 
 // -------------------- CART --------------------
 function addToCart(id, qty = 1) {
-  const p = PRODUCTS.find(x => x.id === id) || myProduce.find(x => x.id === id);
+  const p = allProducts.find(x => x.id === id);
   if (!p) return;
+  const price = p.price_per_kg || p.price;
+  const image = p.image_url || p.image;
   const existing = cart.find(c => c.id === id);
   if (existing) existing.qty += qty;
-  else cart.push({ id: p.id, name: p.name, price: p.price, qty, image: p.image });
+  else cart.push({ id: p.id, name: p.name, price, qty, image });
   saveCart();
 }
 
@@ -428,36 +339,41 @@ function updateCartUI() {
   $('#cartTotal').textContent = formatINR(subtotal + logistics);
 }
 
-function openCart() {
-  $('#cartDrawer').classList.add('open');
-}
+function openCart() { $('#cartDrawer').classList.add('open'); }
+function closeCart() { $('#cartDrawer').classList.remove('open'); }
 
-function closeCart() {
-  $('#cartDrawer').classList.remove('open');
-}
+// -------------------- AI INSIGHTS (API-connected) --------------------
+async function renderDemand(crop = 'tomato') {
+  let d;
+  try {
+    d = await api.get(`/ai/demand?crop=${encodeURIComponent(crop)}`);
+  } catch (e) {
+    // Fallback
+    d = { current_demand: 820, predicted_demand: 1050, trend_pct: 27, recommendation: 'Increase supply', confidence: 87, chart_data: {} };
+  }
 
-// -------------------- AI INSIGHTS --------------------
-function renderDemand(crop = 'tomato') {
-  const d = DEMAND_DATA[crop];
-  if (!d) return;
   $('#demandCards').innerHTML = `
-    <div class="demand-stat"><div class="label">Current Demand</div><div class="value">${d.current} kg</div></div>
-    <div class="demand-stat"><div class="label">Predicted Demand</div><div class="value">${d.predicted} kg</div></div>
-    <div class="demand-stat"><div class="label">Trend</div><div class="value ${d.trend >= 0 ? 'trend-up' : 'trend-down'}">${d.trend >= 0 ? '↑' : '↓'} ${Math.abs(d.trend)}%</div></div>
-    <div class="demand-stat"><div class="label">Recommendation</div><div class="value" style="font-size:1rem">${d.rec}</div></div>
+    <div class="demand-stat"><div class="label">Current Demand</div><div class="value">${d.current_demand} kg</div></div>
+    <div class="demand-stat"><div class="label">Predicted Demand</div><div class="value">${d.predicted_demand} kg</div></div>
+    <div class="demand-stat"><div class="label">Trend</div><div class="value ${d.trend_pct >= 0 ? 'trend-up' : 'trend-down'}">${d.trend_pct >= 0 ? '↑' : '↓'} ${Math.abs(d.trend_pct)}%</div></div>
+    <div class="demand-stat"><div class="label">Recommendation</div><div class="value" style="font-size:1rem">${d.recommendation}</div></div>
     <div class="demand-stat"><div class="label">Confidence</div><div class="value">${d.confidence}%</div></div>
   `;
 
   const ctx = $('#demandChart').getContext('2d');
   if (demandChart) demandChart.destroy();
+
+  const chartLabels = d.chart_data?.labels || ['Current', 'Predicted'];
+  const chartValues = d.chart_data?.values || [d.current_demand, d.predicted_demand];
+
   demandChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Current', 'Predicted'],
+      labels: chartLabels,
       datasets: [{
         label: 'Demand (kg)',
-        data: [d.current, d.predicted],
-        backgroundColor: ['#66bb6a', '#1b5e20'],
+        data: chartValues,
+        backgroundColor: chartLabels.map((_, i) => i < chartLabels.length - 1 ? '#66bb6a' : '#1b5e20'),
         borderRadius: 8
       }]
     },
@@ -469,29 +385,36 @@ function renderDemand(crop = 'tomato') {
   });
 }
 
-function renderPrice(crop = 'tomato') {
-  const p = PRICE_DATA[crop];
-  if (!p) return;
+async function renderPrice(crop = 'tomato') {
+  let p;
+  try {
+    p = await api.get(`/ai/price?crop=${encodeURIComponent(crop)}`);
+  } catch (e) {
+    p = { market_price: 28, local_average: 26, suggested_price: 29, trend: 'up', chart_data: {} };
+  }
+
   const ind = p.trend === 'up' ? '↑ Price increasing' : p.trend === 'down' ? '↓ Price decreasing' : '→ Stable';
   const cls = p.trend === 'up' ? 'up' : p.trend === 'down' ? 'down' : 'stable';
   $('#priceIntel').innerHTML = `
-    <div class="price-box"><div class="label">Current Market Price</div><div class="value">${formatINR(p.market)}/kg</div></div>
-    <div class="price-box"><div class="label">Local Average</div><div class="value">${formatINR(p.local)}/kg</div></div>
-    <div class="price-box"><div class="label">AI Suggested Price</div><div class="value">${formatINR(p.suggested)}/kg</div></div>
+    <div class="price-box"><div class="label">Current Market Price</div><div class="value">${formatINR(p.market_price)}/kg</div></div>
+    <div class="price-box"><div class="label">Local Average</div><div class="value">${formatINR(p.local_average)}/kg</div></div>
+    <div class="price-box"><div class="label">AI Suggested Price</div><div class="value">${formatINR(p.suggested_price)}/kg</div></div>
     <div class="price-box"><div class="label">Price Trend</div><div class="indicator ${cls}">${ind}</div></div>
   `;
 
   const ctx = $('#priceChart').getContext('2d');
   if (priceChart) priceChart.destroy();
-  // Simple trend line (demo)
-  const base = p.market;
+
+  const chartLabels = p.chart_data?.labels || ['W1', 'W2', 'W3', 'W4', 'Now', 'Forecast'];
+  const chartValues = p.chart_data?.values || [p.market_price - 3, p.market_price - 1, p.market_price + 1, p.market_price - 0.5, p.market_price, p.suggested_price];
+
   priceChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ['W1', 'W2', 'W3', 'W4', 'Now', 'Forecast'],
+      labels: chartLabels,
       datasets: [{
         label: 'Price ₹/kg',
-        data: [base - 3, base - 1, base + 1, base - 0.5, base, p.suggested],
+        data: chartValues,
         borderColor: '#1b5e20',
         backgroundColor: 'rgba(27,94,32,0.1)',
         fill: true,
@@ -505,21 +428,27 @@ function renderPrice(crop = 'tomato') {
   });
 }
 
-function renderBuyerMatches(product = 'tomato', sortBy = 'score') {
-  let list = [...(BUYER_MATCHES[product] || [])];
-  if (sortBy === 'score') list.sort((a, b) => b.score - a.score);
-  else if (sortBy === 'price') list.sort((a, b) => b.offer - a.offer);
-  else if (sortBy === 'distance') list.sort((a, b) => a.distance - b.distance);
-  else if (sortBy === 'qty') list.sort((a, b) => b.req - a.req);
+async function renderBuyerMatches(product = 'tomato', sortBy = 'score') {
+  let data;
+  try {
+    data = await api.get(`/ai/match?product=${encodeURIComponent(product)}&sort=${sortBy}`);
+  } catch (e) {
+    data = { matches: [
+      { name: 'FreshMart Wholesale', score: 96, required_qty: 400, distance_km: 18, offer_price: 29 },
+      { name: 'GreenBasket', score: 91, required_qty: 300, distance_km: 25, offer_price: 28 },
+      { name: 'CityFresh Retail', score: 84, required_qty: 200, distance_km: 32, offer_price: 27 }
+    ]};
+  }
 
+  const list = data.matches || [];
   $('#buyerMatches').innerHTML = list.map((b, i) => `
     <div class="match-card">
       <h4>${i + 1}. ${b.name}</h4>
       <div class="match-info">
         <span>Match Score: <strong>${b.score}%</strong></span>
-        <span>Requirement: ${b.req} kg</span>
-        <span>Distance: ${b.distance} km</span>
-        <span>Offer: ${formatINR(b.offer)}/kg</span>
+        <span>Requirement: ${b.required_qty} kg</span>
+        <span>Distance: ${b.distance_km} km</span>
+        <span>Offer: ${formatINR(b.offer_price)}/kg</span>
       </div>
       <div class="match-score-bar"><div class="match-score-fill" style="width:0%" data-score="${b.score}"></div></div>
       <div class="match-actions">
@@ -529,11 +458,8 @@ function renderBuyerMatches(product = 'tomato', sortBy = 'score') {
     </div>
   `).join('');
 
-  // Animate bars
   requestAnimationFrame(() => {
-    $$('.match-score-fill').forEach(el => {
-      el.style.width = el.dataset.score + '%';
-    });
+    $$('.match-score-fill').forEach(el => { el.style.width = el.dataset.score + '%'; });
   });
 
   $$('.accept-offer').forEach(btn => {
@@ -566,19 +492,28 @@ function renderOrder() {
   `;
 }
 
-// -------------------- LOGISTICS --------------------
-function optimizeRoute() {
-  const distances = [38, 35, 42, 31, 29];
-  const times = ['1h 05m', '58m', '1h 15m', '52m', '48m'];
-  const costs = [780, 720, 850, 690, 650];
-  const i = Math.floor(Math.random() * distances.length);
-  $('#routeDistance').textContent = distances[i] + ' km';
-  $('#routeTime').textContent = times[i];
-  $('#routeCost').textContent = formatINR(costs[i]);
-  toast('Route optimized by AI (Prototype)');
+// -------------------- LOGISTICS (API-connected) --------------------
+async function optimizeRoute() {
+  try {
+    const route = await api.post('/ai/route/optimize');
+    $('#routeDistance').textContent = route.distance_km + ' km';
+    $('#routeTime').textContent = route.eta_display;
+    $('#routeCost').textContent = formatINR(route.cost);
+    toast('Route optimized by AI (Prototype)');
+  } catch (e) {
+    // Fallback
+    const distances = [38, 35, 42, 31, 29];
+    const times = ['1h 05m', '58m', '1h 15m', '52m', '48m'];
+    const costs = [780, 720, 850, 690, 650];
+    const i = Math.floor(Math.random() * distances.length);
+    $('#routeDistance').textContent = distances[i] + ' km';
+    $('#routeTime').textContent = times[i];
+    $('#routeCost').textContent = formatINR(costs[i]);
+    toast('Route optimized by AI (Prototype)');
+  }
 }
 
-// -------------------- AUTH --------------------
+// -------------------- AUTH (API-connected) --------------------
 function openAuth(tab = 'login') {
   $('#authModal').classList.add('open');
   switchAuthTab(tab);
@@ -590,33 +525,70 @@ function switchAuthTab(tab) {
   $('#signupForm').classList.toggle('hidden', tab !== 'signup');
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const type = $('#loginType').value;
   const email = $('#loginEmail').value;
-  if (!type || !email) return;
-  currentUser = { type, email, name: email.split('@')[0] };
-  localStorage.setItem('cm_user', JSON.stringify(currentUser));
-  $('#authModal').classList.remove('open');
-  toast(`Welcome back! Logged in as ${type}`);
-  showDashboard(type);
+  const password = $('#loginPassword').value;
+  if (!type || !email || !password) return;
+
+  try {
+    const data = await api.post('/auth/login', { email, password, role: type });
+    api.setToken(data.access_token);
+    currentUser = data.user;
+    currentUser.type = currentUser.role; // backward compat
+    localStorage.setItem('cm_user', JSON.stringify(currentUser));
+    localStorage.setItem('cm_refresh_token', data.refresh_token);
+    $('#authModal').classList.remove('open');
+    toast(`Welcome back! Logged in as ${currentUser.role}`);
+    showDashboard(currentUser.role);
+    updateAuthUI();
+  } catch (err) {
+    toast(err.message || 'Login failed');
+  }
 }
 
-function handleSignup(e) {
+async function handleSignup(e) {
   e.preventDefault();
   const type = $('#signupType').value;
   const name = $('#signupName').value;
   const email = $('#signupEmail').value;
-  if (!type || !name || !email) return;
-  currentUser = { type, name, email, phone: $('#signupPhone').value, location: $('#signupLocation').value };
-  localStorage.setItem('cm_user', JSON.stringify(currentUser));
-  $('#authModal').classList.remove('open');
-  toast(`Account created! Welcome, ${name}`);
-  showDashboard(type);
+  const phone = $('#signupPhone').value;
+  const password = $('#signupPassword').value;
+  const location = $('#signupLocation').value;
+  if (!type || !name || !email || !password) return;
+
+  try {
+    const data = await api.post('/auth/register', { name, email, phone, password, role: type, location });
+    api.setToken(data.access_token);
+    currentUser = data.user;
+    currentUser.type = currentUser.role;
+    localStorage.setItem('cm_user', JSON.stringify(currentUser));
+    localStorage.setItem('cm_refresh_token', data.refresh_token);
+    $('#authModal').classList.remove('open');
+    toast(`Account created! Welcome, ${name}`);
+    showDashboard(currentUser.role);
+    updateAuthUI();
+  } catch (err) {
+    toast(err.message || 'Signup failed');
+  }
+}
+
+function updateAuthUI() {
+  if (currentUser) {
+    $('#loginBtn').textContent = currentUser.name || 'Account';
+    $('#loginBtn').onclick = () => showDashboard(currentUser.role || currentUser.type);
+    $('#getStartedBtn').textContent = 'Dashboard';
+    $('#getStartedBtn').onclick = () => showDashboard(currentUser.role || currentUser.type);
+  } else {
+    $('#loginBtn').textContent = 'Login';
+    $('#loginBtn').onclick = () => openAuth('login');
+    $('#getStartedBtn').textContent = 'Get Started';
+    $('#getStartedBtn').onclick = () => openAuth('signup');
+  }
 }
 
 function showDashboard(type) {
-  // Hide main sections, show relevant dashboard
   const isFarmer = type === 'farmer' || type === 'fpo';
   const isBuyer = type === 'buyer';
 
@@ -624,13 +596,13 @@ function showDashboard(type) {
     $('#farmerDashboard').classList.remove('hidden');
     $('#buyerDashboard').classList.add('hidden');
     updateFarmerStats();
+    loadMyProduce();
     window.scrollTo({ top: $('#farmerDashboard').offsetTop - 80, behavior: 'smooth' });
   } else if (isBuyer) {
     $('#buyerDashboard').classList.remove('hidden');
     $('#farmerDashboard').classList.add('hidden');
     window.scrollTo({ top: $('#buyerDashboard').offsetTop - 80, behavior: 'smooth' });
   } else {
-    // Consumer — stay on marketplace
     toast('You can now browse and buy produce');
     document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' });
   }
@@ -638,84 +610,140 @@ function showDashboard(type) {
 
 function logout() {
   currentUser = null;
+  api.setToken(null);
   localStorage.removeItem('cm_user');
+  localStorage.removeItem('cm_refresh_token');
   $('#farmerDashboard').classList.add('hidden');
   $('#buyerDashboard').classList.add('hidden');
+  updateAuthUI();
   toast('Logged out');
 }
 
-function updateFarmerStats() {
-  const total = PRODUCTS.length + myProduce.length;
-  $('#fdTotalProduce').textContent = total;
+async function updateFarmerStats() {
+  // Try to get real counts from API
+  let produceCount = allProducts.length;
+  try {
+    if (currentUser && apiAvailable) {
+      const myProducts = await api.get(`/products?seller_id=${currentUser.id}`);
+      produceCount = myProducts.length;
+    }
+  } catch (e) { /* use default */ }
+
+  $('#fdTotalProduce').textContent = produceCount;
   $('#fdActiveOrders').textContent = 3;
   $('#fdTotalSales').textContent = '₹48,200';
   $('#fdPending').textContent = '₹12,400';
   if (currentUser) {
-    $('#farmerProfileInfo').textContent = `Logged in as ${currentUser.name || currentUser.email} (${currentUser.type})`;
+    $('#farmerProfileInfo').textContent = `Logged in as ${currentUser.name || currentUser.email} (${currentUser.role || currentUser.type})`;
   }
 }
 
-// -------------------- FARMER LIST PRODUCE --------------------
-function handleListProduce(e) {
+// -------------------- FARMER LIST PRODUCE (API-connected) --------------------
+async function handleListProduce(e) {
   e.preventDefault();
   const item = {
-    id: Date.now(),
     name: $('#lpName').value,
     category: $('#lpCategory').value,
-    quantity: +$('#lpQty').value,
-    price: +$('#lpPrice').value,
+    quantity_kg: +$('#lpQty').value,
+    price_per_kg: +$('#lpPrice').value,
     grade: $('#lpQuality').value,
-    harvest: $('#lpHarvest').value,
+    harvest_date: $('#lpHarvest').value,
     location: $('#lpLocation').value,
-    farmer: currentUser?.name || 'You',
-    fpo: currentUser?.type === 'fpo' ? 'Your FPO' : '',
-    image: $('#lpImage').value || '',
-    delivery: '2-4 days',
-    aiInsight: 'New listing — AI will generate insights after more data.'
+    image_url: $('#lpImage').value || '',
+    farmer_name: currentUser?.name || 'You',
+    fpo_name: currentUser?.role === 'fpo' ? currentUser.name : '',
   };
-  myProduce.push(item);
-  PRODUCTS.push(item); // also appear in marketplace for demo
+
+  try {
+    const product = await api.post('/products', item);
+    allProducts.push(product);
+    myProduce.push(product);
+    toast('Produce listed successfully!');
+  } catch (err) {
+    // Fallback to local
+    const localItem = { ...item, id: Date.now(), price: item.price_per_kg, quantity: item.quantity_kg, status: 'active' };
+    allProducts.push(localItem);
+    myProduce.push(localItem);
+    toast('Produce listed locally (API unavailable)');
+  }
+
   renderMyProduce();
   filterProducts();
   $('#listProduceForm').reset();
   $('#listProduceForm').classList.add('hidden');
   updateFarmerStats();
-  toast('Produce listed successfully!');
+}
+
+async function loadMyProduce() {
+  if (!currentUser || !apiAvailable) return;
+  try {
+    myProduce = await api.get(`/products?seller_id=${currentUser.id}`);
+    renderMyProduce();
+  } catch (e) { /* ignore */ }
 }
 
 function renderMyProduce() {
   const el = $('#myProduceList');
   const all = [...myProduce];
   if (!all.length) {
-    el.innerHTML = '<p style="color:var(--text-muted)">No produce listed yet. Click “List New Produce”.</p>';
+    el.innerHTML = '<p style="color:var(--text-muted)">No produce listed yet. Click "List New Produce".</p>';
     return;
   }
-  el.innerHTML = all.map(p => `
+  el.innerHTML = all.map(p => {
+    const price = p.price_per_kg || p.price;
+    const qty = p.quantity_kg || p.quantity;
+    return `
     <div class="product-card">
       <div class="product-body">
         <h3>${p.name}</h3>
-        <div class="product-meta">${p.quantity} kg · ${formatINR(p.price)}/kg · Grade ${p.grade}</div>
-        <div class="product-meta">${p.location} · ${p.harvest}</div>
+        <div class="product-meta">${qty} kg · ${formatINR(price)}/kg · Grade ${p.grade}</div>
+        <div class="product-meta">${p.location} · ${p.harvest_date || p.harvest || ''}</div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
-// -------------------- BULK REQUIREMENT --------------------
-function handleBulkReq(e) {
+// -------------------- BULK REQUIREMENT (API-connected) --------------------
+async function handleBulkReq(e) {
   e.preventDefault();
-  const product = $('#brProduct').value.toLowerCase();
-  const matches = BUYER_MATCHES[product] || BUYER_MATCHES.tomato;
-  // Reuse match cards but label as farmers
+  const product = $('#brProduct').value;
+  const qty = +$('#brQty').value;
+  const maxPrice = +$('#brMaxPrice').value;
+  const location = $('#brLocation').value;
+  const date = $('#brDate').value;
+
+  let matches;
+  try {
+    // Create requirement in DB
+    await api.post('/requirements', {
+      product_name: product,
+      quantity_kg: qty,
+      max_price: maxPrice,
+      location: location,
+      required_date: date,
+    });
+    // Get matches
+    const matchData = await api.get(`/ai/match?product=${encodeURIComponent(product)}&sort=score`);
+    matches = matchData.matches || [];
+  } catch (e) {
+    // Fallback
+    matches = [
+      { name: 'Farmer nearby', score: 93, required_qty: qty + 100, distance_km: 12, offer_price: maxPrice - 1 },
+      { name: 'FPO farmer', score: 87, required_qty: qty + 50, distance_km: 28, offer_price: maxPrice - 2 },
+      { name: 'Local grower', score: 81, required_qty: qty - 50, distance_km: 40, offer_price: maxPrice - 3 },
+    ];
+  }
+
   $('#bulkMatches').innerHTML = `
     <h4 style="margin:16px 0 12px">Matching Farmers (Prototype)</h4>
     ${matches.map((b, i) => `
       <div class="match-card">
-        <h4>${i + 1}. Farmer near ${b.distance} km</h4>
+        <h4>${i + 1}. ${b.name} (${b.distance_km} km away)</h4>
         <div class="match-info">
           <span>Match: <strong>${b.score}%</strong></span>
-          <span>Available ~${b.req + 100} kg</span>
-          <span>Offer: ${formatINR(b.offer - 1)}/kg</span>
+          <span>Available ~${b.required_qty} kg</span>
+          <span>Offer: ${formatINR(b.offer_price)}/kg</span>
         </div>
         <div class="match-score-bar"><div class="match-score-fill" style="width:${b.score}%"></div></div>
         <button class="btn btn-primary btn-sm">Contact Farmer</button>
@@ -725,10 +753,31 @@ function handleBulkReq(e) {
   toast('Matching farmers found (Prototype)');
 }
 
-// -------------------- CHECKOUT --------------------
-function handleCheckout(e) {
+// -------------------- CHECKOUT (API-connected) --------------------
+async function handleCheckout(e) {
   e.preventDefault();
-  const orderId = 'CM-' + Date.now().toString().slice(-8);
+  const items = cart.map(c => ({
+    product_id: c.id,
+    product_name: c.name,
+    quantity_kg: c.qty,
+    unit_price: c.price,
+  }));
+
+  let orderId;
+  try {
+    const order = await api.post('/orders/checkout', {
+      items,
+      delivery_name: $('#coName').value,
+      delivery_phone: $('#coPhone').value,
+      delivery_address: $('#coAddress').value,
+      payment_method: document.querySelector('input[name="payment"]:checked')?.value || 'upi',
+    });
+    orderId = order.order_ref;
+  } catch (err) {
+    // Fallback
+    orderId = 'CM-' + Date.now().toString().slice(-8);
+  }
+
   $('#successOrderId').textContent = orderId;
   $('#checkoutModal').classList.remove('open');
   $('#successModal').classList.add('open');
@@ -805,8 +854,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedLang = localStorage.getItem('cm_lang') || 'en';
   setLanguage(savedLang);
 
-  // Products
-  renderProducts();
+  // Restore token from localStorage
+  const savedToken = localStorage.getItem('cm_token');
+  if (savedToken) api.setToken(savedToken);
+
+  // Load products from API (falls back to demo data)
+  loadProducts();
 
   // Filters
   ['productSearch', 'categoryFilter', 'locationFilter', 'sortFilter', 'priceRange'].forEach(id => {
@@ -825,27 +878,19 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#demandCrop').addEventListener('change', e => renderDemand(e.target.value));
   $('#priceCrop').addEventListener('change', e => renderPrice(e.target.value));
   $('#matchProduct').addEventListener('change', e => {
-    const key = e.target.value;
-    renderBuyerMatches(key, $('#matchSort').value);
+    renderBuyerMatches(e.target.value, $('#matchSort').value);
   });
   $('#matchSort').addEventListener('change', e => {
-    const key = $('#matchProduct').value;
-    renderBuyerMatches(key, e.target.value);
+    renderBuyerMatches($('#matchProduct').value, e.target.value);
   });
 
   // Order
   renderOrder();
   $('#nextStatusBtn').onclick = () => {
-    if (currentOrderStatus < ORDER_STATUSES.length - 1) {
-      currentOrderStatus++;
-      renderOrder();
-    }
+    if (currentOrderStatus < ORDER_STATUSES.length - 1) { currentOrderStatus++; renderOrder(); }
   };
   $('#prevStatusBtn').onclick = () => {
-    if (currentOrderStatus > 0) {
-      currentOrderStatus--;
-      renderOrder();
-    }
+    if (currentOrderStatus > 0) { currentOrderStatus--; renderOrder(); }
   };
 
   // Logistics
@@ -930,9 +975,9 @@ document.addEventListener('DOMContentLoaded', () => {
     obs.observe(impactSec);
   }
 
-  // Restore user session
+  // Restore user session & update UI
   if (currentUser) {
-    // Optionally auto-show dashboard
+    updateAuthUI();
   }
 
   // Smooth active nav on scroll
