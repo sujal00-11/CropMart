@@ -2,7 +2,7 @@
    CropMart — Design System
    Deep green • Leaf green • Clean modern agri-tech
    ===================================================== */
-
+@import "tailwindcss";
 :root {
   --primary: #1b5e20;
   --primary-light: #2e7d32;
