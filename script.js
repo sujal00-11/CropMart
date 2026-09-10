@@ -4,6 +4,16 @@
    ===================================================== */
 
 // -------------------- DEMO DATA --------------------
+
+import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [
+    tailwindcss(),
+  ],
+})
+
 const PRODUCTS = [
   {
     id: 1,
