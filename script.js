@@ -16,7 +16,7 @@ const PRODUCTS = [
     price: 28,
     grade: 'A',
     harvest: '2026-09-02',
-    image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?w=400&q=80',
     delivery: '2-3 days',
     aiInsight: 'Demand rising. Suggested price ₹29/kg based on local average.'
   },
@@ -31,7 +31,7 @@ const PRODUCTS = [
     price: 18,
     grade: 'A',
     harvest: '2026-08-28',
-    image: 'https://images.unsplash.com/photo-1592924357228-91b4b5c7d0b0?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80',
     delivery: '1-2 days',
     aiInsight: 'Stable demand. Good time to list additional stock.'
   },
@@ -46,7 +46,7 @@ const PRODUCTS = [
     price: 22,
     grade: 'B',
     harvest: '2026-08-20',
-    image: 'https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1592924357228-91b4b5c7d0b0?w=400&q=80',
     delivery: '2-4 days',
     aiInsight: 'Slight price pressure. Consider bulk offers.'
   },
